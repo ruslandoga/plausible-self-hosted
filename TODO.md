@@ -1,0 +1,8 @@
+- [ ] update plausible site settings screen
+- [ ] finish google imports screens
+- [ ] more anchors (to env vars, headings, etc.)
+- [ ] proof-read / edit
+- [ ] finish configuration
+- [ ] finish sub-guides (clickhouse, postgres, docker, etc.)
+- [ ] link discussions (locations, releases, google problems, etc.)
+- [ ] remove overused kbd tags
