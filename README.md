@@ -1,6 +1,6 @@
-<!-- <picture>
+<p align="center">
     <img src="./images/plausible_logo.compressed.png">
-</picture> -->
+</p>
 
 <p align="center">
     <strong>A getting started guide to self-hosting Plausible Community Edition</strong>
@@ -12,9 +12,9 @@
 
 **Contact**:
 
-- Release announcements are posted on https://github.com/plausible/analytics/releases and you can subscribe to them and only them on GitHub.
+- For release announcements please go to [GitHub releases.](https://github.com/plausible/analytics/releases)
 <!-- - Report bugs in a [Github issue](https://github.com/groue/GRDB.swift/issues/new). Make sure you check the [existing issues](https://github.com/groue/GRDB.swift/issues?q=is%3Aopen) first. -->
-- A question? Looking for advice? Go to the [GitHub discussions](https://github.com/plausible/analytics/discussions/categories/self-hosted-support), or the [Plausible forums](#TODO).
+- For a question or advice please go to [GitHub discussions.](https://github.com/plausible/analytics/discussions/categories/self-hosted-support)
 
 ---
 
@@ -30,7 +30,7 @@
 
 ## Installation
 
-Plausible Community Edition is designed to be self-hosted through Docker. You don't have to be a Docker expert to launch your own instance of Plausible. You should have a basic understanding of the command-line and networking to successfully set up your own instance of Plausible.
+Plausible Community Edition is designed to be self-hosted through Docker. You don't have to be a Docker expert to launch your own instance, but you should have a basic understanding of the command-line and networking to successfully set it up.
 
 ### Version management
 
