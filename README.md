@@ -6,14 +6,10 @@
     <strong>A getting started guide to self-hosting Plausible Community Edition</strong>
 </p>
 
-<!-- **Latest release**: January 21, 2024 • [version 6.24.2](https://github.com/groue/GRDB.swift/tree/v6.24.2) • [CHANGELOG](CHANGELOG.md) • [Migrating From GRDB 5 to GRDB 6](Documentation/GRDB6MigrationGuide.md) -->
-
-<!-- **Requirements**: Linux, Docker Compose,  -->
-
 **Contact**:
 
 - For release announcements please go to [GitHub releases.](https://github.com/plausible/analytics/releases)
-<!-- - Report bugs in a [Github issue](https://github.com/groue/GRDB.swift/issues/new). Make sure you check the [existing issues](https://github.com/groue/GRDB.swift/issues?q=is%3Aopen) first. -->
+
 - For a question or advice please go to [GitHub discussions.](https://github.com/plausible/analytics/discussions/categories/self-hosted-support)
 
 ---
@@ -32,36 +28,52 @@
 
 Plausible Community Edition is designed to be self-hosted through Docker. You don't have to be a Docker expert to launch your own instance, but you should have a basic understanding of the command-line and networking to successfully set it up.
 
+### Requirements
+
+The only thing you need to install Plausible is a server with Docker installed. The server must have a CPU with x86_64 or arm64 architecture and support for SSE 4.2 or equivalent NEON instructions. We recommend using a minimum of 4GB of RAM but the requirements will depend on your site traffic. 
+
+We've tested this on [Digital Ocean](https://m.do.co/c/91569eca0213) (affiliate link) but any hosting provider works. If your server doesn't come with Docker pre-installed, you can follow [their docs](https://docs.docker.com/get-docker/) to install it.
+
+To make your Plausible instance accessible on a (sub)domain, you also need to be able to edit your DNS. Plausible isn't currently designed for subfolder installations.
+
+### Quick start
+
+To get started quickly, download the [plausible/hosting](https://github.com/plausible/hosting) repo as a starting point. It has everything you need to boot up your own Plausible server.
+
+<sub><kbd>console</kbd></sub>
+```console
+$ git clone https://github.com/plausible/hosting
+$ cd hosting
+```
+
+Alternatively, you can download and extract the repo as a tarball
+
+<sub><kbd>console</kbd></sub>
+```console
+$ curl -L https://github.com/plausible/hosting/archive/master.tar.gz | tar -xz
+$ cd hosting-master
+```
+
+In the downloaded directory you'll find two important files:
+
+- [`docker-compose.yml`](https://github.com/plausible/hosting/blob/master/docker-compose.yml) - installs and orchestrates networking between your Plausible server, Postgres database, Clickhouse database (for stats), and an SMTP server. It comes with sensible defaults that are ready to go, although you're free to tweak the settings if you wish.
+- [`plausible-conf.env`](https://github.com/plausible/hosting/blob/master/plausible-conf.env) - configures the Plausible server itself. Full configuration options are documented [below.](#configuration)
+
 ### Version management
 
-Plausible follows [semantic versioning](https://semver.org/): `MAJOR.MINOR.PATCH`
+Plausible follows [semantic versioning:](https://semver.org/) `MAJOR.MINOR.PATCH`
 
-You can find available Plausible versions on [DockerHub](https://hub.docker.com/r/plausible/analytics). The default
-`latest` tag refers to the latest stable release tag. You can also pin your version:
+You can find available Plausible versions on [DockerHub](https://hub.docker.com/r/plausible/analytics). The default `latest` tag refers to the latest stable release tag. You can also pin your version:
 
 * `plausible/analytics:v2` pins the major version to `2` but allows minor and patch version upgrades
 * `plausible/analytics:v2.0` pins the minor version to `2.0` but allows only patch upgrades
 
-None of the functionality is backported to older versions. If you wish to get the latest bug fixes and security
-updates you need to upgrade to a newer version.
+None of the functionality is backported to older versions. If you wish to get the latest bug fixes and security updates you need to upgrade to a newer version.
 
-New versions are published on [the releases page](https://github.com/plausible/analytics/releases) and their changes are documented in our [Changelog](https://github.com/plausible/analytics/blob/master/CHANGELOG.md).
-Please note that database schema changes require running migrations when you're upgrading. However, we consider the schema
+New versions are published on [the releases page](https://github.com/plausible/analytics/releases) and their changes are documented in our [Changelog.](https://github.com/plausible/analytics/blob/master/CHANGELOG.md) Please note that database schema changes require running migrations when you're upgrading. However, we consider the schema
 as an internal API and therefore schema changes aren't considered a breaking change.
 
-### Requirements
-
-The only thing you need to install Plausible Analytics is a server with Docker installed. The server must have a CPU with x86_64 or arm64 architecture
-and support for SSE 4.2 or equivalent NEON instructions. We recommend using a minimum of 4GB of RAM but the requirements will depend on your site traffic. 
-
-We've tested this on [Digital Ocean](https://m.do.co/c/91569eca0213) (affiliate link)
-but any hosting provider works. If your server doesn't come with Docker pre-installed, you can follow [their docs](https://docs.docker.com/get-docker/) to install it.
-
-To make your Plausible instance accessible on a (sub)domain, you also need to be able to edit your DNS. Plausible isn't currently designed for subfolder installations.
-
 ## Configuration
-
-When running a Plausible release, the following configuration parameters can be supplied as environment variables.
 
 Plausible is configured with environment variables, by default supplied via [<kbd>plausible-conf.env</kbd>](https://github.com/plausible/hosting/blob/master/plausible-conf.env) [env_file.](https://github.com/plausible/hosting/blob/bb6decee4d33ccf84eb235b6053443a01498db53/docker-compose.yml#L38-L39) They are read at startup in [`config/runtime.exs`](https://github.com/plausible/analytics/blob/master/config/runtime.exs)
 
@@ -74,7 +86,6 @@ Here's the minimal <kbd>plausible-conf.env</kbd>
 ```env
 BASE_URL=https://example.com
 SECRET_KEY_BASE=GLVzDZW04FzuS1gMcmBRVhwgd4Gu9YmSl/k/TqfTUXti7FLBd7aflXeQDdwCj6Cz
-TOTP_VAULT_KEY=dsxvbn3jxDd16az2QpsX5B8O+llxjQ2SJE2i5Bzx38I=
 ```
 
 And here's <kbd>plausible-conf.env</kbd> with extra configuration
@@ -82,7 +93,6 @@ And here's <kbd>plausible-conf.env</kbd> with extra configuration
 ```env
 BASE_URL=https://example.com
 SECRET_KEY_BASE=GLVzDZW04FzuS1gMcmBRVhwgd4Gu9YmSl/k/TqfTUXti7FLBd7aflXeQDdwCj6Cz
-TOTP_VAULT_KEY=dsxvbn3jxDd16az2QpsX5B8O+llxjQ2SJE2i5Bzx38I=
 PORT=8000
 MAXMIND_LICENSE_KEY=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
 MAXMIND_EDITION=GeoLite2-City
@@ -127,25 +137,6 @@ SECRET_KEY_BASE=GLVzDZW04FzuS1gMcmBRVhwgd4Gu9YmSl/k/TqfTUXti7FLBd7aflXeQDdwCj6Cz
 ``````
 
 > ⚠️ Don't use this exact value or someone would be able to sign a cookie with `user_id=1` and log in as the admin!
-
----
-
-#### `TOTP_VAULT_KEY`
-
-Configures the secret used for encrypting TOTP secrets at rest, doesn't have any defaults and needs to be provided in the ENV vars, can be generated with `openssl rand -base64 32`
-
-<sub><kbd>console</kbd></sub>
-```console
-$ openssl rand -base64 32
-dsxvbn3jxDd16az2QpsX5B8O+llxjQ2SJE2i5Bzx38I=
-```
-
-<sub><kbd>plausible-conf.env</kbd></sub>
-```env
-TOTP_VAULT_KEY=dsxvbn3jxDd16az2QpsX5B8O+llxjQ2SJE2i5Bzx38I=
-``````
-
-> ⚠️ Please don't use this exact value :)
 
 ### Registration
 
@@ -286,7 +277,7 @@ Default: `GeoLite2-City`
 
 ### Email
 
-Plausible uses a SMTP server to send transactional emails e.g. account activation, password reset. In addition, it sends non-transactional emails like weekly or monthly reports.
+Plausible CE uses a SMTP server to send transactional emails e.g. account activation, password reset. In addition, it sends non-transactional emails like weekly or monthly reports.
 
 #### `MAILER_ADAPTER`
 
