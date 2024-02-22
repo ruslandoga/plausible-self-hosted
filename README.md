@@ -1,6 +1,343 @@
+<!-- <picture>
+    <img src="./images/plausible_logo.compressed.png">
+</picture> -->
+
+<p align="center">
+    <strong>A getting started guide to self-hosting Plausible Community Edition</strong>
+</p>
+
+<!-- **Latest release**: January 21, 2024 • [version 6.24.2](https://github.com/groue/GRDB.swift/tree/v6.24.2) • [CHANGELOG](CHANGELOG.md) • [Migrating From GRDB 5 to GRDB 6](Documentation/GRDB6MigrationGuide.md) -->
+
+<!-- **Requirements**: Linux, Docker Compose,  -->
+
+**Contact**:
+
+- Release announcements are posted on https://github.com/plausible/analytics/releases and you can subscribe to them and only them on GitHub.
+<!-- - Report bugs in a [Github issue](https://github.com/groue/GRDB.swift/issues/new). Make sure you check the [existing issues](https://github.com/groue/GRDB.swift/issues?q=is%3Aopen) first. -->
+- A question? Looking for advice? Go to the [GitHub discussions](https://github.com/plausible/analytics/discussions/categories/self-hosted-support), or the [Plausible forums](#TODO).
+
+---
+
+<p align="center">
+    <a href="#installation">Installation</a> &bull;
+    <a href="#configuration">Configuration</a> &bull;
+    <a href="#reverse-proxy">Reverse Proxy</a> &bull;
+    <a href="#google-search">Google Search</a> &bull;
+    <a href="#faq">FAQ</a>
+</p>
+
+---
+
+## Installation
+
+Plausible Community Edition is designed to be self-hosted through Docker. You don't have to be a Docker expert to launch your own instance of Plausible. You should have a basic understanding of the command-line and networking to successfully set up your own instance of Plausible.
+
+### Version management
+
+Plausible follows [semantic versioning](https://semver.org/): `MAJOR.MINOR.PATCH`
+
+You can find available Plausible versions on [DockerHub](https://hub.docker.com/r/plausible/analytics). The default
+`latest` tag refers to the latest stable release tag. You can also pin your version:
+
+* `plausible/analytics:v2` pins the major version to `2` but allows minor and patch version upgrades
+* `plausible/analytics:v2.0` pins the minor version to `2.0` but allows only patch upgrades
+
+None of the functionality is backported to older versions. If you wish to get the latest bug fixes and security
+updates you need to upgrade to a newer version.
+
+New versions are published on [the releases page](https://github.com/plausible/analytics/releases) and their changes are documented in our [Changelog](https://github.com/plausible/analytics/blob/master/CHANGELOG.md).
+Please note that database schema changes require running migrations when you're upgrading. However, we consider the schema
+as an internal API and therefore schema changes aren't considered a breaking change.
+
+### Requirements
+
+The only thing you need to install Plausible Analytics is a server with Docker installed. The server must have a CPU with x86_64 or arm64 architecture
+and support for SSE 4.2 or equivalent NEON instructions. We recommend using a minimum of 4GB of RAM but the requirements will depend on your site traffic. 
+
+We've tested this on [Digital Ocean](https://m.do.co/c/91569eca0213) (affiliate link)
+but any hosting provider works. If your server doesn't come with Docker pre-installed, you can follow [their docs](https://docs.docker.com/get-docker/) to install it.
+
+To make your Plausible instance accessible on a (sub)domain, you also need to be able to edit your DNS. Plausible isn't currently designed for subfolder installations.
+
+## Configuration
+
+When running a Plausible release, the following configuration parameters can be supplied as environment variables.
+
+Plausible is configured with environment variables, by default supplied via [<kbd>plausible-conf.env</kbd>](https://github.com/plausible/hosting/blob/master/plausible-conf.env) [env_file.](https://github.com/plausible/hosting/blob/bb6decee4d33ccf84eb235b6053443a01498db53/docker-compose.yml#L38-L39) They are read at startup in [`config/runtime.exs`](https://github.com/plausible/analytics/blob/master/config/runtime.exs)
+
+In the [container image](https://hub.docker.com/r/plausible/analytics) this script is located at `/app/releases/0.0.1/runtime.exs` and you can mount a custom one if, for example, you want to configure some option which doesn't have an environment varible in the default script.
+
+Note that if you start a container with one set of ENV vars and then update the ENV vars and restart the container, they won't take effect due to the immutable nature of the containers. The container needs to be recreated.
+
+Here's the minimal <kbd>plausible-conf.env</kbd>
+
+```env
+BASE_URL=https://example.com
+SECRET_KEY_BASE=GLVzDZW04FzuS1gMcmBRVhwgd4Gu9YmSl/k/TqfTUXti7FLBd7aflXeQDdwCj6Cz
+```
+
+And here's <kbd>plausible-conf.env</kbd> with extra configuration
+
+```env
+BASE_URL=https://example.com
+SECRET_KEY_BASE=GLVzDZW04FzuS1gMcmBRVhwgd4Gu9YmSl/k/TqfTUXti7FLBd7aflXeQDdwCj6Cz
+PORT=8000
+MAXMIND_LICENSE_KEY=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
+MAXMIND_EDITION=GeoLite2-Country
+GOOGLE_CLIENT_ID=140927866833-002gqg48rl4iku76lbkk0qhu0i0m7bia.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=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
+MAILER_NAME=Plausible
+MAILER_EMAIL=plausible@example.com
+SENTRY_DSN=https://7f16d5d6ee70465789e082bd09481556@o1012425.ingest.sentry.io/6643873
+DISABLE_REGISTRATION=invite_only
+```
+
+Here're the currently supported ENV vars:
+
+### Required
+
+#### `BASE_URL`
+
+Configures the URL to use in link generation, doesn't have any defaults and needs to be provided in the ENV vars
+
+<sub><kbd>plausible-conf.env</kbd></sub>
+```env
+BASE_URL=https://who.copycat.fun
+```
+
+---
+
+#### `SECRET_KEY_BASE`
+
+Configures the secret used for sessions in the dashboard, doesn't have any defaults and needs to be provided in the ENV vars, can be generated with `openssl rand -base64 48`
+
+<sub><kbd>console</kbd></sub>
+```console
+$ openssl rand -base64 48
+ouVdiHkQ11wdrafe4GzIuAPjcdWjFduIse6rBd3HtF99d34b6ivlPaS2Yh4I7ImE
+```
+
+<sub><kbd>plausible-conf.env</kbd></sub>
+```env
+SECRET_KEY_BASE=ouVdiHkQ11wdrafe4GzIuAPjcdWjFduIse6rBd3HtF99d34b6ivlPaS2Yh4I7ImE
+``````
+
+> ⚠️ Don't use this exact value or someone would be able to sign a cookie with `user_id=1` and log in as the admin.
+
+### Registration
+
+#### `DISABLE_REGISTRATION`
+
+Default: `true`
+
+---
+
+#### `ENABLE_EMAIL_VERIFICATION`
+
+Default: `false`
+
+### Web
+
+#### `LISTEN_IP`
+
+Default: `0.0.0.0`
+
+Configures the IP address to bind the listen socket for the web server. Note that setting it to `127.0.0.1` in a container would make the web server unavailable from outside the container.
+
+---
+
+#### `PORT`
+
+Default: `8000`
+
+Configures the port to bind the listen socket for the web server.
+
+### Database
+
+#### `DATABASE_URL`
+
+Default: `postgres://postgres:postgres@plausible_db:5432/plausible_db`
+
+Configures the URL for PostgreSQL database.
+
+---
+
+#### `CLICKHOUSE_DATABASE_URL`
+
+Default: `http://plausible_events_db:8123/plausible_events_db`
+
+Configures the URL for ClickHouse database.
+
+---
+
+#### `ECTO_IPV6`
+
+---
+
+#### `DATABASE_CACERTFILE`
+
+---
+
+#### `ECTO_CH_IPV6`
+
+---
+
+#### `CLICKHOUSE_CACERTFILE`
+
+### Google
+
+#### `GOOGLE_CLIENT_ID`
+
+---
+
+#### `GOOGLE_CLIENT_SECRET`
+
+### Locations
+
+#### `IP_GEOLOCATION_DB`
+
+Default: `/app/lib/plausible-0.0.1/priv/geodb/dbip-country.mmdb.gz`
+
+Defaults to the one shipped within the container image.
+
+This database is used to lookup GeoName IDs for IP addresses.
+
+---
+
+#### `GEONAMES_SOURCE_FILE`
+
+Default: `/app/lib/location-0.1.0/priv/geonames.lite.csv`
+
+Defaults to the one shipped within the container image.
+
+This file is used to turn GeoName IDs into human readable string for display on the dashboard.
+
+---
+
+#### `MAXMIND_LICENSE_KEY`
+
+If set, this ENV variable takes precedence over `IP_GEOLOCATION_DB` and makes Plausible download (and keep up to date) a free MaxMind GeoLite2 MMDB of the selected edition (see below).
+
+<sub><kbd>plausible-conf.env</kbd></sub>
+```env
+MAXMIND_LICENSE_KEY=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
+```
+
+---
+
+#### `MAXMIND_EDITION`
+
+Default: `GeoLite2-City`
+
+### Email
+
+#### `MAILER_ADAPTER`
+
+Default: `Bamboo.SMTPAdapter`
+
+The adapter to use for sending the mail.
+
+---
+
+#### `MAILER_EMAIL`
+
+Default: `hello@plausible.local`
+
+---
+
+#### `MAILER_NAME`
+
+If set, for example, to `Hello Plausible`, the mail would be sent with `from` combining `MAILER_NAME` and `MAILER_NAME` like this:
+
+```
+From: Hello Plausible <hello@plausible.local>
+```
+
+---
+
+#### `POSTMARK_API_KEY`
+
+---
+
+#### `MAILGUN_API_KEY`
+
+---
+
+#### `MAILGUN_DOMAIN`
+
+---
+
+#### `MAILGUN_BASE_URI`
+
+---
+
+#### `MANDRILL_API_KEY`
+
+---
+
+#### `SENDGRID_API_KEY`
+
+---
+
+#### `SMTP_HOST_ADDR`
+
+---
+
+#### `SMTP_HOST_PORT`
+
+---
+
+#### `SMTP_USER_NAME`
+
+---
+
+#### `SMTP_USER_PWD`
+
+---
+
+#### `SMTP_HOST_SSL_ENABLED`
+
+---
+
+#### `SMTP_RETRIES`
+
+---
+
+#### `SMTP_MX_LOOKUPS_ENABLED`
+
+### Misc
+
+#### `LOG_FORMAT`
+
+Default: `standard`
+
+Configures the format that log line are printed in, supports `standard` and `json`
+
+---
+
+#### `STORAGE_DIR`
+
+---
+
+#### `SENTRY_DSN`
+
+---
+
+#### `LOG_FAILED_LOGIN_ATTEMPTS`
+
+Default: `false`
+
+---
+
+#### `SECURE_COOKIE`
+
+Default: `false`
+
+## Google Search Integration
+
 Integrating with Google either to get search keywords for hits from Google search or for imports from Universal Analytics can be frustrating.
 
-The following screenshot-annotated guide shows how to do it all in the easiest way possible. Follow the Google-colored arrows.
+The following screenshot-annotated guide shows how to do it all in an easy way: follow the Google-colored arrows.
 
 Here's the outline of what we'll do:
 
@@ -240,3 +577,10 @@ Pick the view to import and then follow the Plausible directions.
 <img src="./images/6-pick-view.png">
 
 You'll receive an email once the data is imported.
+
+## FAQ
+
+- useful clickhouse commands
+- useful docker commands
+- useful postgres commands
+- useful plausible commands
