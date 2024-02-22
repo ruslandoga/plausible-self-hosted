@@ -1,5 +1,9 @@
 <p align="center">
-    <img src="./images/plausible_logo.compressed.png">
+    <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="./images/logo_dark.svg">
+        <source media="(prefers-color-scheme: light)" srcset="./images/logo_light.svg">
+        <img src="./images/logo_light.svg">
+    </picture>
 </p>
 
 <p align="center">
