@@ -87,6 +87,48 @@ SECRET_KEY_BASE=GLVzDZW04FzuS1gMcmBRVhwgd4Gu9YmSl/k/TqfTUXti7FLBd7aflXeQDdwCj6Cz
 
 We can start our instance now but the requests would be served over HTTP. Not cool! Let's configure [Caddy](https://caddyserver.com) to enable HTTPS.
 
+First we need to point DNS records for plausible.example.com to the IP address of the instance. This is needed for Caddy to issue the TLS certificates.
+
+Then we need to let Caddy know the domain name for which to issue the TLS certificate and the service to redirect the requests to.
+
+<sub><kbd>[reverse-proxy/docker-compose.caddy-gen.yml](https://github.com/plausible/hosting/blob/master/reverse-proxy/docker-compose.caddy-gen.yml)</kbd></sub>
+```diff
+  plausible:
+    labels:
+-     virtual.host: "example.com" # change to your domain name
++     virtual.host: "plausible.example.com"
+      virtual.port: "8000"
+-     virtual.tls-email: "admin@example.com" # change to your email
++     virtual.tls-email: "admin@plausible.example.com"
+```
+
+We also need to update `BASE_URL` to use `https://` scheme.
+
+<sub><kbd>plausible-conf.env</kbd></sub>
+```diff
+- BASE_URL=http://plausible.example.com
++ BASE_URL=https://plausible.example.com
+SECRET_KEY_BASE=GLVzDZW04FzuS1gMcmBRVhwgd4Gu9YmSl/k/TqfTUXti7FLBd7aflXeQDdwCj6Cz
+```
+
+> For other reverse-proxy setups please see [reverse-proxy](https://github.com/plausible/hosting/tree/master/reverse-proxy) docs.
+
+Now we can start everything together.
+
+```console
+$ docker compose -f docker-compose.yml -f reverse-proxy/docker-compose.caddy-gen.yml up -d
+```
+
+It takes some time to start PostgreSQL and ClickHouse, create the databases, and run the migrations. After about fifteen seconds you should be able to access your instance at `BASE_URL`
+
+In case something feels off, make sure to check out the logs
+
+```console
+$ docker compose logs -f
+```
+
+and start a [GitHub discussion.](https://github.com/plausible/analytics/discussions/categories/self-hosted-support)
+
 ### Version management
 
 Plausible follows [semantic versioning:](https://semver.org/) `MAJOR.MINOR.PATCH`
