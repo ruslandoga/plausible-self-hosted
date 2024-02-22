@@ -59,7 +59,7 @@ In the downloaded directory you'll find two important files:
 - [`docker-compose.yml`](https://github.com/plausible/hosting/blob/master/docker-compose.yml) - installs and orchestrates networking between your Plausible server, Postgres database, Clickhouse database (for stats), and an SMTP server. It comes with sensible defaults that are ready to go, although you're free to tweak the settings if you wish.
 - [`plausible-conf.env`](https://github.com/plausible/hosting/blob/master/plausible-conf.env) - configures the Plausible server itself. Full configuration options are documented [below.](#configuration)
 
-We'll need to populate the latter one with the required configuration. Right now it looks like this:
+We'll need to populate the latter with the required configuration. Right now it looks like this:
 
 <sub><kbd>[plausible-conf.env](https://github.com/plausible/hosting/blob/master/plausible-conf.env)</kbd></sub>
 ```env
@@ -67,9 +67,9 @@ BASE_URL=replace-me
 SECRET_KEY_BASE=replace-me
 ```
 
-Let's replace these required ENV vars with out own values.
+Let's do as it asks and replace these required environment variables with our own values.
 
-First we'll generate the `SECRET_KEY_BASE` using `openssl`
+First we generate the `SECRET_KEY_BASE` using `openssl`
 
 <sub><kbd>console</kbd></sub>
 ```console
@@ -77,15 +77,15 @@ $ openssl rand -base64 48
 GLVzDZW04FzuS1gMcmBRVhwgd4Gu9YmSl/k/TqfTUXti7FLBd7aflXeQDdwCj6Cz
 ```
 
-And then we need to decide the URL where the instance would be accessible. Let's assume we decide to put it at `plausible.example.com`
+And then we decide the URL where the instance would be accessible. Let's assume we choose `plausible.example.com`
 
 <sub><kbd>plausible-conf.env</kbd></sub>
 ```env
 BASE_URL=http://plausible.example.com
 SECRET_KEY_BASE=GLVzDZW04FzuS1gMcmBRVhwgd4Gu9YmSl/k/TqfTUXti7FLBd7aflXeQDdwCj6Cz
-``````
+```
 
-Note that by default Plausible is not using HTTPS. We'll add a reverse proxy to fix it. An easy one to add is Caddy.
+We can start our instance now but the requests would be served over HTTP. Not cool! Let's configure [Caddy](https://caddyserver.com) to enable HTTPS.
 
 ### Version management
 
