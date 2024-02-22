@@ -67,13 +67,14 @@ Plausible is configured with environment variables, by default supplied via [<kb
 
 In the [container image](https://hub.docker.com/r/plausible/analytics) this script is located at `/app/releases/0.0.1/runtime.exs` and you can mount a custom one if, for example, you want to configure some option which doesn't have an environment varible in the default script.
 
-Note that if you start a container with one set of ENV vars and then update the ENV vars and restart the container, they won't take effect due to the immutable nature of the containers. The container needs to be recreated.
+> Note that if you start a container with one set of ENV vars and then update the ENV vars and restart the container, they won't take effect due to the immutable nature of the containers. The container needs to be recreated.
 
 Here's the minimal <kbd>plausible-conf.env</kbd>
 
 ```env
 BASE_URL=https://example.com
 SECRET_KEY_BASE=GLVzDZW04FzuS1gMcmBRVhwgd4Gu9YmSl/k/TqfTUXti7FLBd7aflXeQDdwCj6Cz
+TOTP_VAULT_KEY=dsxvbn3jxDd16az2QpsX5B8O+llxjQ2SJE2i5Bzx38I=
 ```
 
 And here's <kbd>plausible-conf.env</kbd> with extra configuration
@@ -81,9 +82,10 @@ And here's <kbd>plausible-conf.env</kbd> with extra configuration
 ```env
 BASE_URL=https://example.com
 SECRET_KEY_BASE=GLVzDZW04FzuS1gMcmBRVhwgd4Gu9YmSl/k/TqfTUXti7FLBd7aflXeQDdwCj6Cz
+TOTP_VAULT_KEY=dsxvbn3jxDd16az2QpsX5B8O+llxjQ2SJE2i5Bzx38I=
 PORT=8000
 MAXMIND_LICENSE_KEY=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
-MAXMIND_EDITION=GeoLite2-Country
+MAXMIND_EDITION=GeoLite2-City
 GOOGLE_CLIENT_ID=140927866833-002gqg48rl4iku76lbkk0qhu0i0m7bia.apps.googleusercontent.com
 GOOGLE_CLIENT_SECRET=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
 MAILER_NAME=Plausible
@@ -98,12 +100,14 @@ Here're the currently supported ENV vars:
 
 #### `BASE_URL`
 
-Configures the URL to use in link generation, doesn't have any defaults and needs to be provided in the ENV vars
+Configures the base URL to use in link generation, doesn't have any defaults and needs to be provided in the ENV vars
 
 <sub><kbd>plausible-conf.env</kbd></sub>
 ```env
-BASE_URL=https://who.copycat.fun
+BASE_URL=https://example.fun
 ```
+
+> In production systems, this should be your ingress host (CDN or proxy).
 
 ---
 
@@ -114,15 +118,34 @@ Configures the secret used for sessions in the dashboard, doesn't have any defau
 <sub><kbd>console</kbd></sub>
 ```console
 $ openssl rand -base64 48
-ouVdiHkQ11wdrafe4GzIuAPjcdWjFduIse6rBd3HtF99d34b6ivlPaS2Yh4I7ImE
+GLVzDZW04FzuS1gMcmBRVhwgd4Gu9YmSl/k/TqfTUXti7FLBd7aflXeQDdwCj6Cz
 ```
 
 <sub><kbd>plausible-conf.env</kbd></sub>
 ```env
-SECRET_KEY_BASE=ouVdiHkQ11wdrafe4GzIuAPjcdWjFduIse6rBd3HtF99d34b6ivlPaS2Yh4I7ImE
+SECRET_KEY_BASE=GLVzDZW04FzuS1gMcmBRVhwgd4Gu9YmSl/k/TqfTUXti7FLBd7aflXeQDdwCj6Cz
 ``````
 
-> ⚠️ Don't use this exact value or someone would be able to sign a cookie with `user_id=1` and log in as the admin.
+> ⚠️ Don't use this exact value or someone would be able to sign a cookie with `user_id=1` and log in as the admin!
+
+---
+
+#### `TOTP_VAULT_KEY`
+
+Configures the secret used for encrypting TOTP secrets at rest, doesn't have any defaults and needs to be provided in the ENV vars, can be generated with `openssl rand -base64 32`
+
+<sub><kbd>console</kbd></sub>
+```console
+$ openssl rand -base64 32
+dsxvbn3jxDd16az2QpsX5B8O+llxjQ2SJE2i5Bzx38I=
+```
+
+<sub><kbd>plausible-conf.env</kbd></sub>
+```env
+TOTP_VAULT_KEY=dsxvbn3jxDd16az2QpsX5B8O+llxjQ2SJE2i5Bzx38I=
+``````
+
+> ⚠️ Please don't use this exact value :)
 
 ### Registration
 
@@ -130,11 +153,15 @@ SECRET_KEY_BASE=ouVdiHkQ11wdrafe4GzIuAPjcdWjFduIse6rBd3HtF99d34b6ivlPaS2Yh4I7ImE
 
 Default: `true`
 
+Restricts registration of new users. Possible values are `true` (full restriction), `false` (no restriction), and `invite_only` (only the invited users can register).
+
 ---
 
 #### `ENABLE_EMAIL_VERIFICATION`
 
 Default: `false`
+
+When enabled, new users need to verify their email addressby following a link delivered to their mailbox.
 
 ### Web
 
@@ -142,7 +169,9 @@ Default: `false`
 
 Default: `0.0.0.0`
 
-Configures the IP address to bind the listen socket for the web server. Note that setting it to `127.0.0.1` in a container would make the web server unavailable from outside the container.
+Configures the IP address to bind the listen socket for the web server.
+
+> Note that setting it to `127.0.0.1` in a container would make the web server unavailable from outside the container.
 
 ---
 
@@ -153,6 +182,8 @@ Default: `8000`
 Configures the port to bind the listen socket for the web server.
 
 ### Database
+
+Plausible uses PostgreSQL for storing user data and ClickhouseDB for analytics data. Use the following variables to configure them.
 
 #### `DATABASE_URL`
 
@@ -172,25 +203,47 @@ Configures the URL for ClickHouse database.
 
 #### `ECTO_IPV6`
 
----
+Enables Ecto to use IPv6 when connecting to the PostgreSQL database. Not set by default.
 
-#### `DATABASE_CACERTFILE`
+<sub><kbd>plausible-conf.env</kbd></sub>
+```env
+ECTO_IPV6=true
+```
 
 ---
 
 #### `ECTO_CH_IPV6`
 
----
+Enables Ecto to use IPv6 when connecting to the ClickHouse database. Not set by default.
 
-#### `CLICKHOUSE_CACERTFILE`
+<sub><kbd>plausible-conf.env</kbd></sub>
+```env
+ECTO_CH_IPV6=true
+```
 
 ### Google
 
+For step-by-step integration with Google [see below.](#google-search-integration)
+
 #### `GOOGLE_CLIENT_ID`
+
+The Client ID from the Google API Console for your project. Not set by default.
+
+<sub><kbd>plausible-conf.env</kbd></sub>
+```env
+GOOGLE_CLIENT_ID=140927866833-002gqg48rl4iku76lbkk0qhu0i0m7bia.apps.googleusercontent.com
+```
 
 ---
 
 #### `GOOGLE_CLIENT_SECRET`
+
+The Client Secret from the Google API Console for your project. Not set by default.
+
+<sub><kbd>plausible-conf.env</kbd></sub>
+```env
+GOOGLE_CLIENT_SECRET=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
+```
 
 ### Locations
 
@@ -198,7 +251,7 @@ Configures the URL for ClickHouse database.
 
 Default: `/app/lib/plausible-0.0.1/priv/geodb/dbip-country.mmdb.gz`
 
-Defaults to the one shipped within the container image.
+Defaults to the `.mmdb` file shipped within the container image.
 
 This database is used to lookup GeoName IDs for IP addresses.
 
@@ -210,7 +263,7 @@ Default: `/app/lib/location-0.1.0/priv/geonames.lite.csv`
 
 Defaults to the one shipped within the container image.
 
-This file is used to turn GeoName IDs into human readable string for display on the dashboard.
+This file is used to turn GeoName IDs into human readable strings for display on the dashboard.
 
 ---
 
@@ -227,9 +280,13 @@ MAXMIND_LICENSE_KEY=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
 
 #### `MAXMIND_EDITION`
 
+MaxMind database edition to use (only if `MAXMIND_LICENSE_KEY` is set)
+
 Default: `GeoLite2-City`
 
 ### Email
+
+Plausible uses a SMTP server to send transactional emails e.g. account activation, password reset. In addition, it sends non-transactional emails like weekly or monthly reports.
 
 #### `MAILER_ADAPTER`
 
