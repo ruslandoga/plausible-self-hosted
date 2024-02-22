@@ -19,16 +19,16 @@
 ---
 
 <p align="center">
-    <a href="#installation">Installation</a> &bull;
-    <a href="#upgrading">Upgrading</a> &bull;
-    <a href="#configuration">Configuration</a> &bull;
-    <a href="#integration">Integration</a> &bull;
+    <a href="#install">Install</a> &bull;
+    <a href="#upgrade">Upgrade</a> &bull;
+    <a href="#configure">Configure</a> &bull;
+    <a href="#integrate">Integrate</a> &bull;
     <a href="#faq">FAQ</a>
 </p>
 
 ---
 
-## Installation
+## Install
 
 Plausible Community Edition is designed to be self-hosted through Docker. You don't have to be a Docker expert to launch your own instance, but you should have a basic understanding of the command-line and networking to successfully set it up.
 
@@ -137,7 +137,7 @@ Happy hosting!
 
 Next we'll go over how to upgrade the instance when a new release comes out. More things to configure. And how to integrate with Google!
 
-## Upgrading
+## Upgrade
 
 ### Version management
 
@@ -153,7 +153,7 @@ None of the functionality is backported to older versions. If you wish to get th
 New versions are published on [the releases page](https://github.com/plausible/analytics/releases) and their changes are documented in our [Changelog.](https://github.com/plausible/analytics/blob/master/CHANGELOG.md) Please note that database schema changes require running migrations when you're upgrading. However, we consider the schema
 as an internal API and therefore schema changes aren't considered a breaking change.
 
-## Configuration
+## Configure
 
 Plausible is configured with environment variables, by default supplied via [<kbd>plausible-conf.env</kbd>](https://github.com/plausible/hosting/blob/master/plausible-conf.env) [env_file.](https://github.com/plausible/hosting/blob/bb6decee4d33ccf84eb235b6053443a01498db53/docker-compose.yml#L38-L39) They are read at startup in [`config/runtime.exs`](https://github.com/plausible/analytics/blob/master/config/runtime.exs)
 
@@ -461,7 +461,9 @@ Default: `false`
 
 Default: `false`
 
-## Google Search Integration
+## Integrate
+
+### Google
 
 Integrating with Google either to get search keywords for hits from Google search or for imports from Universal Analytics can be frustrating.
 
@@ -705,6 +707,8 @@ Pick the view to import and then follow the Plausible directions.
 <img src="./images/6-pick-view.png">
 
 You'll receive an email once the data is imported.
+
+### MaxMind
 
 ## FAQ
 
