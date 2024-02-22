@@ -10,6 +10,8 @@
     <strong>A getting started guide to self-hosting Plausible Community Edition</strong>
 </p>
 
+<!-- TODO latest version, current version, requirements -->
+
 **Contact**:
 
 - For release announcements please go to [GitHub releases.](https://github.com/plausible/analytics/releases)
@@ -30,19 +32,19 @@
 
 ## Install
 
-Plausible Community Edition is designed to be self-hosted through Docker. You don't have to be a Docker expert to launch your own instance, but you should have a basic understanding of the command-line and networking to successfully set it up.
+Plausible Community Edition (or CE for short) is designed to be self-hosted through Docker. You don't have to be a Docker expert to launch your own instance, but you should have a basic understanding of the command-line and networking to successfully set it up.
 
 ### Requirements
 
-The only thing you need to install Plausible is a server with Docker installed. The server must have a CPU with x86_64 or arm64 architecture and support for SSE 4.2 or equivalent NEON instructions. We recommend using a minimum of 4GB of RAM but the requirements will depend on your site traffic. 
+The only thing you need to install Plausible CE is a server with Docker. The server must have a CPU with x86_64 or arm64 architecture and support for SSE 4.2 or equivalent NEON instructions. We recommend using a minimum of 4GB of RAM but the requirements will depend on your site traffic. 
 
 We've tested this on [Digital Ocean](https://m.do.co/c/91569eca0213) (affiliate link) but any hosting provider works. If your server doesn't come with Docker pre-installed, you can follow [their docs](https://docs.docker.com/get-docker/) to install it.
 
-To make your Plausible instance accessible on a (sub)domain, you also need to be able to edit your DNS. Plausible isn't currently designed for subfolder installations.
+To make your Plausible CE instance accessible on a (sub)domain, you also need to be able to edit your DNS. Plausible CE isn't currently designed for subfolder installations.
 
 ### Quick start
 
-To get started quickly, download the [plausible/hosting](https://github.com/plausible/hosting) repo as a starting point. It has everything you need to boot up your own Plausible server.
+To get started quickly, clone the [plausible/hosting](https://github.com/plausible/hosting) repo. It has everything you need to boot up your own Plausible CE server.
 
 <sub><kbd>console</kbd></sub>
 ```console
@@ -50,20 +52,12 @@ $ git clone https://github.com/plausible/hosting
 $ cd hosting
 ```
 
-Alternatively, you can download and extract the repo as a tarball
-
-<sub><kbd>console</kbd></sub>
-```console
-$ curl -L https://github.com/plausible/hosting/archive/master.tar.gz | tar -xz
-$ cd hosting-master
-```
-
 In the downloaded directory you'll find two important files:
 
-- [`docker-compose.yml`](https://github.com/plausible/hosting/blob/master/docker-compose.yml) - installs and orchestrates networking between your Plausible server, Postgres database, Clickhouse database (for stats), and an SMTP server. It comes with sensible defaults that are ready to go, although you're free to tweak the settings if you wish.
+- [`docker-compose.yml`](https://github.com/plausible/hosting/blob/master/docker-compose.yml) - installs and orchestrates networking between your Plausible CE server, Postgres database, Clickhouse database (for stats), and an SMTP server.
 - [`plausible-conf.env`](https://github.com/plausible/hosting/blob/master/plausible-conf.env) - configures the Plausible server itself. Full configuration options are documented [below.](#configuration)
 
-We'll need to populate the latter with the required configuration. Right now it looks like this:
+Right now the latter looks like this:
 
 <sub><kbd>[plausible-conf.env](https://github.com/plausible/hosting/blob/master/plausible-conf.env)</kbd></sub>
 ```env
@@ -71,7 +65,7 @@ BASE_URL=replace-me
 SECRET_KEY_BASE=replace-me
 ```
 
-Let's do as it asks and replace these required environment variables with our own values.
+Let's do as it asks and populate these required environment variables with our own values.
 
 First we generate the `SECRET_KEY_BASE` using `openssl`
 
@@ -81,17 +75,23 @@ $ openssl rand -base64 48
 GLVzDZW04FzuS1gMcmBRVhwgd4Gu9YmSl/k/TqfTUXti7FLBd7aflXeQDdwCj6Cz
 ```
 
-And then we decide the URL where the instance would be accessible. Let's assume we choose `plausible.example.com`
+And then we decide on the URL where the instance would be accessible. Let's assume we choose `plausible.example.com`
 
 <sub><kbd>plausible-conf.env</kbd></sub>
-```env
-BASE_URL=http://plausible.example.com
-SECRET_KEY_BASE=GLVzDZW04FzuS1gMcmBRVhwgd4Gu9YmSl/k/TqfTUXti7FLBd7aflXeQDdwCj6Cz
+```diff
+- BASE_URL=replace-me
++ BASE_URL=http://plausible.example.com
+- SECRET_KEY_BASE=replace-me
++ SECRET_KEY_BASE=GLVzDZW04FzuS1gMcmBRVhwgd4Gu9YmSl/k/TqfTUXti7FLBd7aflXeQDdwCj6Cz
 ```
 
 We can start our instance now but the requests would be served over HTTP. Not cool! Let's configure [Caddy](https://caddyserver.com) to enable HTTPS.
 
-First we need to point DNS records for plausible.example.com to the IP address of the instance. This is needed for Caddy to issue the TLS certificates.
+<!-- TODO note about CloudFlare -->
+
+> For other reverse-proxy setups please see [reverse-proxy](https://github.com/plausible/hosting/tree/master/reverse-proxy) docs.
+
+First we need to point DNS records for `plausible.example.com` to the IP address of the instance. This is needed for Caddy to issue the TLS certificates.
 
 Then we need to let Caddy know the domain name for which to issue the TLS certificate and the service to redirect the requests to.
 
@@ -106,7 +106,7 @@ Then we need to let Caddy know the domain name for which to issue the TLS certif
 +     virtual.tls-email: "admin@plausible.example.com"
 ```
 
-We also need to update `BASE_URL` to use `https://` scheme.
+Finally we need to update `BASE_URL` to use `https://` scheme.
 
 <sub><kbd>plausible-conf.env</kbd></sub>
 ```diff
@@ -115,10 +115,9 @@ We also need to update `BASE_URL` to use `https://` scheme.
 SECRET_KEY_BASE=GLVzDZW04FzuS1gMcmBRVhwgd4Gu9YmSl/k/TqfTUXti7FLBd7aflXeQDdwCj6Cz
 ```
 
-> For other reverse-proxy setups please see [reverse-proxy](https://github.com/plausible/hosting/tree/master/reverse-proxy) docs.
-
 Now we can start everything together.
 
+<sub><kbd>console</kbd></sub>
 ```console
 $ docker compose -f docker-compose.yml -f reverse-proxy/docker-compose.caddy-gen.yml up -d
 ```
@@ -127,6 +126,7 @@ It takes some time to start PostgreSQL and ClickHouse, create the databases, and
 
 In case something feels off, make sure to check out the logs
 
+<sub><kbd>console</kbd></sub>
 ```console
 $ docker compose logs -f
 ```
@@ -135,23 +135,39 @@ and start a [GitHub discussion.](https://github.com/plausible/analytics/discussi
 
 Happy hosting!
 
-Next we'll go over how to upgrade the instance when a new release comes out. More things to configure. And how to integrate with Google!
+Next we'll go over how to upgrade the instance when a new release comes out, more things to configure, and how to integrate with Google and others!
 
 ## Upgrade
 
+Each new [release](https://github.com/plausible/analytics/releases/tag/v2.0.0) contains information on how to upgrade to it from the previous version. This section outlines the 
+general steps and explains the versioning.
+
 ### Version management
 
-Plausible follows [semantic versioning:](https://semver.org/) `MAJOR.MINOR.PATCH`
+Plausible CE follows [semantic versioning:](https://semver.org/) `MAJOR.MINOR.PATCH`
 
 You can find available Plausible versions on [DockerHub](https://hub.docker.com/r/plausible/analytics). The default `latest` tag refers to the latest stable release tag. You can also pin your version:
 
-* `plausible/analytics:v2` pins the major version to `2` but allows minor and patch version upgrades
-* `plausible/analytics:v2.0` pins the minor version to `2.0` but allows only patch upgrades
+- `plausible/analytics:v2` pins the major version to `2` but allows minor and patch version upgrades
+- `plausible/analytics:v2.0` pins the minor version to `2.0` but allows only patch upgrades
 
 None of the functionality is backported to older versions. If you wish to get the latest bug fixes and security updates you need to upgrade to a newer version.
 
 New versions are published on [the releases page](https://github.com/plausible/analytics/releases) and their changes are documented in our [Changelog.](https://github.com/plausible/analytics/blob/master/CHANGELOG.md) Please note that database schema changes require running migrations when you're upgrading. However, we consider the schema
 as an internal API and therefore schema changes aren't considered a breaking change.
+
+We recommend to pin the major version instead of using `latest`. Either way the general flow for upgrading between minor version would look like this:
+
+```console
+$ cd hosting
+$ docker compose down --remove-orphans
+$ docker compose pull plausible
+$ docker compose -f docker-compose.yml -f reverse-proxy/docker-compose.caddy-gen.yml up -d
+```
+
+> You can omit <kbd>-f docker-compose.yml -f reverse-proxy/docker-compose.caddy-gen.yml</kbd> if you are not using Caddy.
+
+Changes in major versions would involve performing a data migration (e.g.[v2.0.0.](https://github.com/plausible/analytics/releases/tag/v2.0.0)) or some other extra step.
 
 ## Configure
 
@@ -164,14 +180,14 @@ In the [container image](https://hub.docker.com/r/plausible/analytics) this scri
 Here's the minimal <kbd>plausible-conf.env</kbd>
 
 ```env
-BASE_URL=https://example.com
+BASE_URL=https://plausible.example.com
 SECRET_KEY_BASE=GLVzDZW04FzuS1gMcmBRVhwgd4Gu9YmSl/k/TqfTUXti7FLBd7aflXeQDdwCj6Cz
 ```
 
 And here's <kbd>plausible-conf.env</kbd> with extra configuration
 
 ```env
-BASE_URL=https://example.com
+BASE_URL=https://plausible.example.com
 SECRET_KEY_BASE=GLVzDZW04FzuS1gMcmBRVhwgd4Gu9YmSl/k/TqfTUXti7FLBd7aflXeQDdwCj6Cz
 PORT=8000
 MAXMIND_LICENSE_KEY=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
@@ -179,8 +195,8 @@ MAXMIND_EDITION=GeoLite2-City
 GOOGLE_CLIENT_ID=140927866833-002gqg48rl4iku76lbkk0qhu0i0m7bia.apps.googleusercontent.com
 GOOGLE_CLIENT_SECRET=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
 MAILER_NAME=Plausible
-MAILER_EMAIL=plausible@example.com
-SENTRY_DSN=https://7f16d5d6ee70465789e082bd09481556@o1012425.ingest.sentry.io/6643873
+MAILER_EMAIL=plausible@plausible.example.com
+SENTRY_DSN=https://7f16e5d6dd72465789e081bd09481556@o1012425.ingest.sentry.io/6643873
 DISABLE_REGISTRATION=invite_only
 ```
 
