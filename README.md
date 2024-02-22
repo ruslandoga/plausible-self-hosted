@@ -218,7 +218,10 @@ SECRET_KEY_BASE=GLVzDZW04FzuS1gMcmBRVhwgd4Gu9YmSl/k/TqfTUXti7FLBd7aflXeQDdwCj6Cz
 
 > ⚠️ Don't use this exact value or someone would be able to sign a cookie with `user_id=1` and log in as the admin!
 
-### Registration
+### Optional
+
+<details>
+<summary>Registration</summary>
 
 #### `DISABLE_REGISTRATION`
 
@@ -234,7 +237,9 @@ Default: `false`
 
 When enabled, new users need to verify their email addressby following a link delivered to their mailbox.
 
-### Web
+</details>
+<details>
+<summary>Web</summary>
 
 #### `LISTEN_IP`
 
@@ -252,7 +257,9 @@ Default: `8000`
 
 Configures the port to bind the listen socket for the web server.
 
-### Database
+</details>
+<details>
+<summary>Database</summary>
 
 Plausible uses PostgreSQL for storing user data and ClickhouseDB for analytics data. Use the following variables to configure them.
 
@@ -292,7 +299,9 @@ Enables Ecto to use IPv6 when connecting to the ClickHouse database. Not set by 
 ECTO_CH_IPV6=true
 ```
 
-### Google
+</details>
+<details>
+<summary>Google</summary>
 
 For step-by-step integration with Google [see below.](#google-search-integration)
 
@@ -316,8 +325,8 @@ The Client Secret from the Google API Console for your project. Not set by defau
 GOOGLE_CLIENT_SECRET=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
 ```
 
+</details>
 <details>
-
 <summary>Locations</summary>
 
 #### `IP_GEOLOCATION_DB`
@@ -358,9 +367,7 @@ MaxMind database edition to use (only if `MAXMIND_LICENSE_KEY` is set)
 Default: `GeoLite2-City`
 
 </details>
-
 <details>
-
 <summary>Email</summary>
 
 Plausible CE uses a SMTP server to send transactional emails e.g. account activation, password reset. In addition, it sends non-transactional emails like weekly or monthly reports.
@@ -440,21 +447,8 @@ From: Hello Plausible <hello@plausible.local>
 #### `SMTP_MX_LOOKUPS_ENABLED`
 
 </details>
-
 <details>
 <summary>Misc</summary>
-
-#### `LOG_FORMAT`
-
-Default: `standard`
-
-Configures the format that log line are printed in, supports `standard` and `json`
-
----
-
-#### `STORAGE_DIR`
-
----
 
 #### `SENTRY_DSN`
 
@@ -721,8 +715,10 @@ Pick the view to import and then follow the Plausible directions.
 You'll receive an email once the data is imported.
 
 </details>
+<details>
+<summary>MaxMind</summary>
 
-### MaxMind
+</details>
 
 ## FAQ
 
