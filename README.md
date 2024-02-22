@@ -129,6 +129,10 @@ $ docker compose logs -f
 
 and start a [GitHub discussion.](https://github.com/plausible/analytics/discussions/categories/self-hosted-support)
 
+Happy hosting!
+
+Next we'll go over how to upgrade the instance when a new release comes out. More things to configure. And how to integrate with Google!
+
 ### Version management
 
 Plausible follows [semantic versioning:](https://semver.org/) `MAJOR.MINOR.PATCH`
