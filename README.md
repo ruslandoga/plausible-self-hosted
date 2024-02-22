@@ -316,7 +316,9 @@ The Client Secret from the Google API Console for your project. Not set by defau
 GOOGLE_CLIENT_SECRET=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
 ```
 
-### Locations
+<details>
+
+<summary>Locations</summary>
 
 #### `IP_GEOLOCATION_DB`
 
@@ -355,7 +357,11 @@ MaxMind database edition to use (only if `MAXMIND_LICENSE_KEY` is set)
 
 Default: `GeoLite2-City`
 
-### Email
+</details>
+
+<details>
+
+<summary>Email</summary>
 
 Plausible CE uses a SMTP server to send transactional emails e.g. account activation, password reset. In addition, it sends non-transactional emails like weekly or monthly reports.
 
@@ -433,7 +439,10 @@ From: Hello Plausible <hello@plausible.local>
 
 #### `SMTP_MX_LOOKUPS_ENABLED`
 
-### Misc
+</details>
+
+<details>
+<summary>Misc</summary>
 
 #### `LOG_FORMAT`
 
@@ -461,9 +470,12 @@ Default: `false`
 
 Default: `false`
 
+</details>
+
 ## Integrate
 
-### Google
+<details>
+<summary>Google</summary>
 
 Integrating with Google either to get search keywords for hits from Google search or for imports from Universal Analytics can be frustrating.
 
@@ -707,6 +719,8 @@ Pick the view to import and then follow the Plausible directions.
 <img src="./images/6-pick-view.png">
 
 You'll receive an email once the data is imported.
+
+</details>
 
 ### MaxMind
 
