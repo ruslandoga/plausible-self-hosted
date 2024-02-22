@@ -16,9 +16,9 @@
 
 <p align="center">
     <a href="#installation">Installation</a> &bull;
+    <a href="#upgrading">Upgrading</a> &bull;
     <a href="#configuration">Configuration</a> &bull;
-    <a href="#reverse-proxy">Reverse Proxy</a> &bull;
-    <a href="#google-search">Google Search</a> &bull;
+    <a href="#integration">Integration</a> &bull;
     <a href="#faq">FAQ</a>
 </p>
 
@@ -132,6 +132,8 @@ and start a [GitHub discussion.](https://github.com/plausible/analytics/discussi
 Happy hosting!
 
 Next we'll go over how to upgrade the instance when a new release comes out. More things to configure. And how to integrate with Google!
+
+## Upgrading
 
 ### Version management
 
