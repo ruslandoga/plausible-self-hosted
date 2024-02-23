@@ -453,24 +453,6 @@ Alternatively, you can use other [Bamboo Adapters](https://hexdocs.pm/bamboo/rea
 In case you are using Postmark, you have to set the MAILER_EMAIL variable which needs to be configured in PostmarkApps sender signatures.
 
 </details>
-<details>
-<summary>Misc</summary>
-
-#### `SENTRY_DSN`
-
----
-
-#### `LOG_FAILED_LOGIN_ATTEMPTS`
-
-Default: `false`
-
----
-
-#### `SECURE_COOKIE`
-
-Default: `false`
-
-</details>
 
 ## Integrate
 
@@ -483,21 +465,22 @@ The following screenshot-annotated guide shows how to do it all in an easy way: 
 
 Here's the outline of what we'll do:
 
-- Set up OAuth on Google Cloud
-    - Select or create a Google Cloud project
-    - Register an OAuth application for a domain
-    - Issue an OAuth client and key for that application
-    - Verify the chosen domain on Google Search console
-- Integrate with Google Search
-    - Enable APIs for Google Search integration
-    - Link it with Plausible
-- Import historical data from Universal Analytics
-    - Enable APIs for exports on Google Cloud
-    - Import into Plausible
+<!-- no toc -->
+- [Set up OAuth on Google Cloud](#set-up-oauth-on-google-cloud)
+  - [Select or create a Google Cloud project](#select-or-create-a-google-cloud-project)
+  - [Register an OAuth application for a domain](#register-an-oauth-application-for-a-domain)
+  - [Issue an OAuth client and key for that application](#issue-an-oauth-client-and-key-for-that-application)
+  - [Verify the chosen domain on Google Search console](#verify-the-chosen-domain-on-google-search-console)
+- [Integrate with Google Search](#integrate-with-google-search)
+  - [Enable APIs for Google Search integration](#enable-apis-for-google-search-integration)
+  - [Link it with Plausible](#link-it-with-plausible)
+- [Import historical data from Universal Analytics](#import-historical-data-from-universal-analytics)
+  - [Enable APIs for exports on Google Cloud](#enable-apis-for-exports-on-google-cloud)
+  - [Import into Plausible](#import-into-plausible)
 
 ### Set up OAuth on Google Cloud
 
-#### Select ot create a Google Cloud project
+#### Select or create a Google Cloud project
 
 Go to [Google Cloud console,](http://console.cloud.google.com/) for example, by clicking <kbd>Go to console</kbd> on [Google Cloud landing page.](https://cloud.google.com) If Google asks you to register, just do it.
 
