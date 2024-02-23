@@ -67,7 +67,7 @@ SECRET_KEY_BASE=replace-me
 
 Let's do as it asks and populate these required environment variables with our own values.
 
-First we generate the `SECRET_KEY_BASE` using `openssl`
+First we generate the [`SECRET_KEY_BASE`](#secret_key_base) using `openssl`
 
 <sub><kbd>console</kbd></sub>
 ```console
@@ -75,7 +75,7 @@ $ openssl rand -base64 48
 GLVzDZW04FzuS1gMcmBRVhwgd4Gu9YmSl/k/TqfTUXti7FLBd7aflXeQDdwCj6Cz
 ```
 
-And then we decide on the URL where the instance would be accessible. Let's assume we choose `http://plausible.example.com`
+And then we decide on the [`BASE_URL`](#base_url) where the instance would be accessible. Let's assume we choose `http://plausible.example.com`
 
 <sub><kbd>plausible-conf.env</kbd></sub>
 ```diff
