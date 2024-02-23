@@ -739,7 +739,9 @@ You'll receive an email once the data is imported.
 ## FAQ
 
 <details>
-<summary>How do I access Plausible console?</summary>
+<summary>How do I access Plausible from terminal?</summary>
+
+You can starts an Interactive Elixir session from within the `plausible` container:
 
 <sub><kbd>console</kbd></sub>
 ```console
@@ -765,7 +767,9 @@ iex> Application.get_all_env :plausible
 </details>
 
 <details>
-<summary>How do I access ClickHouse console?</summary>
+<summary>How do I access ClickHouse from terminal?</summary>
+
+You can starts a `clickhouse client` session from within the `plausible_events_db` container:
 
 <sub><kbd>console</kbd></sub>
 ```console
@@ -801,7 +805,9 @@ $ docker compose exec plausible_events_db clickhouse client --database plausible
 </details>
 
 <details>
-<summary>How do I access PostgreSQL console?</summary>
+<summary>How do I access PostgreSQL from terminal?</summary>
+
+You can starts a `psql` session from within the `plausible_db` container:
 
 <sub><kbd>console</kbd></sub>
 ```console
@@ -811,7 +817,6 @@ $ docker compose exec plausible_db psql -U postgres -h localhost -d plausible_db
 ```sql
 plausible_db=# \d
 
---                                List of relations
 --  Schema |                      Name                      |   Type   |  Owner
 -- --------+------------------------------------------------+----------+----------
 --  public | api_keys                                       | table    | postgres
@@ -883,7 +888,6 @@ plausible_db=# \d
 --  public | users_id_seq                                   | sequence | postgres
 --  public | weekly_reports                                 | table    | postgres
 --  public | weekly_reports_id_seq                          | sequence | postgres
--- (69 rows)
 
 plausible_db=# exit
 ```
