@@ -656,6 +656,10 @@ Trust our own application.
 
 <img src="./images/6-continue.png">
 
+Trust more.
+
+<img src="./images/6-sign-in-copycat.png">
+
 Allow viewing Search Console data.
 
 <img src="./images/6-view-search-console-data.png">
@@ -706,9 +710,21 @@ Trust our own application.
 
 <img src="./images/6-continue.png">
 
-Pick the view to import and then follow the Plausible directions.
+Trust more.
+
+<img src="./images/6-data-continue.png">
+
+Pick the view to import.
 
 <img src="./images/6-pick-view.png">
+
+And then follow the Plausible directions.
+
+<img src="./images/6-import-continue.png">
+
+Confirm everything's in order and start the import.
+
+<img src="./images/6-import.png">
 
 You'll receive an email once the data is imported.
 
