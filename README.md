@@ -49,6 +49,14 @@ To get started quickly, clone the [plausible/hosting](https://github.com/plausib
 <sub><kbd>console</kbd></sub>
 ```console
 $ git clone https://github.com/plausible/hosting
+Cloning into 'hosting'...
+remote: Enumerating objects: 280, done.
+remote: Counting objects: 100% (146/146), done.
+remote: Compressing objects: 100% (74/74), done.
+remote: Total 280 (delta 106), reused 86 (delta 71), pack-reused 134
+Receiving objects: 100% (280/280), 69.44 KiB | 7.71 MiB/s, done.
+Resolving deltas: 100% (136/136), done.
+
 $ cd hosting
 ```
 
@@ -112,7 +120,7 @@ Finally we need to update `BASE_URL` to use `https://` scheme.
 ```diff
 - BASE_URL=http://plausible.example.com
 + BASE_URL=https://plausible.example.com
-SECRET_KEY_BASE=GLVzDZW04FzuS1gMcmBRVhwgd4Gu9YmSl/k/TqfTUXti7FLBd7aflXeQDdwCj6Cz
+  SECRET_KEY_BASE=GLVzDZW04FzuS1gMcmBRVhwgd4Gu9YmSl/k/TqfTUXti7FLBd7aflXeQDdwCj6Cz
 ```
 
 Now we can start everything together.
@@ -580,13 +588,12 @@ $ docker compose rm plausible
 ? Going to remove hosting-plausible-1 Yes
 [+] Running 1/0
  ⠿ Container hosting-plausible-1  Removed
-$ docker compose create plausible
-[+] Running 4/0
- ⠿ Container hosting-plausible_events_db-1  Running 0.0s
- ⠿ Container hosting-mail-1                 Running 0.0s
- ⠿ Container hosting-plausible_db-1         Running 0.0s
- ⠿ Container hosting-plausible-1            Created
-$ docker compose start plausible
+$ docker compose -f docker-compose.yml -f reverse-proxy/docker-compose.caddy-gen.yml up -d
+[+] Running 4/4
+ ✔ Container hosting-plausible_events_db-1  Running    0.0s
+ ✔ Container hosting-plausible_db-1         Running    0.0s
+ ✔ Container hosting-plausible-1            Started    1.2s
+ ✔ Container caddy-gen                      Running    0.0s
 [+] Running 3/3
  ⠿ Container hosting-plausible_db-1         Healthy 0.5s
  ⠿ Container hosting-plausible_events_db-1  Healthy 0.5s
@@ -594,6 +601,8 @@ $ docker compose start plausible
 $ docker compose exec plausible sh -c 'echo $GOOGLE_CLIENT_ID'
 974728454958-e1vcqqqs6hmoc394663kjrkgfajrifdg.apps.googleusercontent.com
 ```
+
+> You can omit <kbd>-f docker-compose.yml -f reverse-proxy/docker-compose.caddy-gen.yml</kbd> if you are not using Caddy
 
 #### Verify the chosen domain on Google Search console
 
