@@ -388,42 +388,21 @@ Plausible CE uses the country database created by [db-ip](https://db-ip.com/) fo
 
 Optionally, you can provide a different database. For example, you can use [MaxMind](https://www.maxmind.com) services and enable city-level geolocation.
 
-#### `IP_GEOLOCATION_DB`
 
-Default: `/app/lib/plausible-0.0.1/priv/geodb/dbip-country.mmdb.gz`
+| Parameter              | Default                                                                                                                             | Description                                                                                                                                                                                                                        |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `IP_GEOLOCATION_DB`    | <kbd>/app/lib/plausible-0.0.1/priv/geodb/dbip-country.mmdb.gz</kbd>                                                                 | This database is used to lookup GeoName IDs for IP addresses. Defaults to the file shipped within the container image.                                                                                                             |
+| `GEONAMES_SOURCE_FILE` | <kbd>[/app/lib/location-0.1.0/priv/geonames.lite.csv](https://github.com/plausible/location/blob/main/priv/geonames.lite.csv)</kbd> | This file is used to turn GeoName IDs into human readable strings for display on the dashboard. Defaults to the one shipped within the container image.                                                                            |
+| `MAXMIND_LICENSE_KEY`  | --                                                                                                                                  | If set, this ENV variable takes precedence over `IP_GEOLOCATION_DB` and makes Plausible download (and keep up to date) a free MaxMind GeoLite2 MMDB of the selected edition. [See below](#integrate) for integration instructions. |
+| `MAXMIND_EDITION`      | <kbd>GeoLite2-City</kbd>                                                                                                            | MaxMind database edition to use (only if `MAXMIND_LICENSE_KEY` is set)                                                                                                                                                             |
 
-Defaults to the file shipped within the container image.
-
-This database is used to lookup GeoName IDs for IP addresses.
-
----
-
-#### `GEONAMES_SOURCE_FILE`
-
-Default: [`/app/lib/location-0.1.0/priv/geonames.lite.csv`]((https://github.com/plausible/location/blob/main/priv/geonames.lite.csv))
-
-Defaults to the one shipped within the container image.
-
-This file is used to turn GeoName IDs into human readable strings for display on the dashboard.
-
----
-
-#### `MAXMIND_LICENSE_KEY`
-
-If set, this ENV variable takes precedence over `IP_GEOLOCATION_DB` and makes Plausible download (and keep up to date) a free MaxMind GeoLite2 MMDB of the selected edition (see below).
-
-<sub><kbd>plausible-conf.env</kbd></sub>
+<sub>Example <kbd>plausible-conf.env</kbd> with MaxMind configured</sub>
 ```env
+BASE_URL=https://plausible.example.com
+SECRET_KEY_BASE=GLVzDZW04FzuS1gMcmBRVhwgd4Gu9YmSl/k/TqfTUXti7FLBd7aflXeQDdwCj6Cz
 MAXMIND_LICENSE_KEY=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
+MAXMIND_EDITION=GeoLite2-City
 ```
-
----
-
-#### `MAXMIND_EDITION`
-
-MaxMind database edition to use (only if `MAXMIND_LICENSE_KEY` is set)
-
-Default: `GeoLite2-City`
 
 </details>
 <details><summary>Email</summary>
