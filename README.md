@@ -128,6 +128,17 @@ Now we can start everything together.
 <sub><kbd>console</kbd></sub>
 ```console
 $ docker compose -f docker-compose.yml -f reverse-proxy/docker-compose.caddy-gen.yml up -d
+[+] Running 19/19
+ ✔ plausible_db 9 layers [⣿⣿⣿⣿⣿⣿⣿]          Pulled
+ ✔ plausible_events_db 7 layers [⣿⣿⣿⣿⣿⣿⣿]   Pulled
+ ✔ plausible 7 layers [⣿⣿⣿⣿⣿⣿⣿]             Pulled
+ ✔ caddy-gen 8 layers [⣿⣿⣿⣿⣿⣿⣿⣿]            Pulled
+[+] Running 5/5
+ ✔ Network hosting_default                  Created
+ ✔ Container hosting-plausible_db-1         Started
+ ✔ Container hosting-plausible_events_db-1  Started
+ ✔ Container hosting-plausible-1            Started
+ ✔ Container caddy-gen                      Started
 ```
 
 It takes some time to start PostgreSQL and ClickHouse, create the databases, and run the migrations. After about fifteen seconds you should be able to access your instance at `BASE_URL` and see the registration screen for the admin user.
@@ -136,7 +147,7 @@ In case something feels off, make sure to check out the logs
 
 <sub><kbd>console</kbd></sub>
 ```console
-$ docker compose logs -f
+$ docker compose logs
 ```
 
 and start a [GitHub discussion.](https://github.com/plausible/analytics/discussions/categories/self-hosted-support)
