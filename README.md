@@ -75,7 +75,7 @@ $ openssl rand -base64 48
 GLVzDZW04FzuS1gMcmBRVhwgd4Gu9YmSl/k/TqfTUXti7FLBd7aflXeQDdwCj6Cz
 ```
 
-And then we decide on the URL where the instance would be accessible. Let's assume we choose `plausible.example.com`
+And then we decide on the URL where the instance would be accessible. Let's assume we choose `http://plausible.example.com`
 
 <sub><kbd>plausible-conf.env</kbd></sub>
 ```diff
@@ -122,7 +122,7 @@ Now we can start everything together.
 $ docker compose -f docker-compose.yml -f reverse-proxy/docker-compose.caddy-gen.yml up -d
 ```
 
-It takes some time to start PostgreSQL and ClickHouse, create the databases, and run the migrations. After about fifteen seconds you should be able to access your instance at `BASE_URL`
+It takes some time to start PostgreSQL and ClickHouse, create the databases, and run the migrations. After about fifteen seconds you should be able to access your instance at `BASE_URL` and see the registration screen for the admin user.
 
 In case something feels off, make sure to check out the logs
 
@@ -343,13 +343,17 @@ GOOGLE_CLIENT_SECRET=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
 
 </details>
 <details>
-<summary>Locations</summary>
+<summary>IP Geolocation</summary>
+
+Plausible CE uses the country database created by [dbip](https://db-ip.com/) for enriching analytics data with visitor countries. The database is shipped within the container image and country data collection happens automatically.
+
+Optionally, you can provide a different database. For example, you can use [MaxMind](https://www.maxmind.com) services and enable city-level geolocation.
 
 #### `IP_GEOLOCATION_DB`
 
 Default: `/app/lib/plausible-0.0.1/priv/geodb/dbip-country.mmdb.gz`
 
-Defaults to the `.mmdb` file shipped within the container image.
+Defaults to the file shipped within the container image.
 
 This database is used to lookup GeoName IDs for IP addresses.
 
@@ -357,7 +361,7 @@ This database is used to lookup GeoName IDs for IP addresses.
 
 #### `GEONAMES_SOURCE_FILE`
 
-Default: `/app/lib/location-0.1.0/priv/geonames.lite.csv`
+Default: [`/app/lib/location-0.1.0/priv/geonames.lite.csv`]((https://github.com/plausible/location/blob/main/priv/geonames.lite.csv))
 
 Defaults to the one shipped within the container image.
 
@@ -388,79 +392,30 @@ Default: `GeoLite2-City`
 
 Plausible CE uses a SMTP server to send transactional emails e.g. account activation, password reset. In addition, it sends non-transactional emails like weekly or monthly reports.
 
-#### `MAILER_ADAPTER`
+| Parameter             | Default               | Description                                                                     |
+| --------------------- | --------------------- | ------------------------------------------------------------------------------- |
+| MAILER_EMAIL          | hello@plausible.local | The email id to use for as _from_ address of all communications from Plausible. |
+| MAILER_NAME           | --                    | The display name for the sender (_from_).                                       |
+| SMTP_HOST_ADDR        | localhost             | The host address of your smtp server.                                           |
+| SMTP_HOST_PORT        | 25                    | The port of your smtp server.                                                   |
+| SMTP_USER_NAME        | --                    | The username/email in case SMTP auth is enabled.                                |
+| SMTP_USER_PWD         | --                    | The password in case SMTP auth is enabled.                                      |
+| SMTP_HOST_SSL_ENABLED | false                 | If SSL is enabled for SMTP connection                                           |
+| SMTP_RETRIES          | 2                     | Number of retries to make until mailer gives up.                                |
 
-Default: `Bamboo.SMTPAdapter`
+Alternatively, you can use other [Bamboo Adapters](https://hexdocs.pm/bamboo/readme.html#available-adapters) such as Postmark, Mailgun, Mandrill or Send Grid to send transactional emails. In this case, use the following parameters:
 
-The adapter to use for sending the mail.
+| Parameter        | Default            | Description                                                                                                                                                                                                                                                                           |
+| ---------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| MAILER_ADAPTER   | Bamboo.SMTPAdapter | Instead of the default, replace this with `Bamboo.PostmarkAdapter`, `Bamboo.MailgunAdapter`, `Bamboo.MandrillAdapter` or `Bamboo.SendGridAdapter` and add the appropriate variables below                                                                                             |
+| POSTMARK_API_KEY | --                 | Required. Enter your API key.                                                                                                                                                                                                                                                         |
+| MAILGUN_API_KEY  | --                 | Required. Enter your API key.                                                                                                                                                                                                                                                         |
+| MAILGUN_DOMAIN   | --                 | Required. Enter your Mailgun domain.                                                                                                                                                                                                                                                  |
+| MAILGUN_BASE_URI | --                 | This is optional. Mailgun makes a difference in the API base URL between sender domains from within the EU and outside. By default, the base URL is set to `https://api.mailgun.net/v3`. To override this you can pass `https://api.eu.mailgun.net/v3` if you are using an EU domain. |
+| MANDRILL_API_KEY | --                 | Required. Enter your API key.                                                                                                                                                                                                                                                         |
+| SENDGRID_API_KEY | --                 | Required. Enter your API key.                                                                                                                                                                                                                                                         |
 
----
-
-#### `MAILER_EMAIL`
-
-Default: `hello@plausible.local`
-
----
-
-#### `MAILER_NAME`
-
-If set, for example, to `Hello Plausible`, the mail would be sent with `from` combining `MAILER_NAME` and `MAILER_NAME` like this:
-
-```
-From: Hello Plausible <hello@plausible.local>
-```
-
----
-
-#### `POSTMARK_API_KEY`
-
----
-
-#### `MAILGUN_API_KEY`
-
----
-
-#### `MAILGUN_DOMAIN`
-
----
-
-#### `MAILGUN_BASE_URI`
-
----
-
-#### `MANDRILL_API_KEY`
-
----
-
-#### `SENDGRID_API_KEY`
-
----
-
-#### `SMTP_HOST_ADDR`
-
----
-
-#### `SMTP_HOST_PORT`
-
----
-
-#### `SMTP_USER_NAME`
-
----
-
-#### `SMTP_USER_PWD`
-
----
-
-#### `SMTP_HOST_SSL_ENABLED`
-
----
-
-#### `SMTP_RETRIES`
-
----
-
-#### `SMTP_MX_LOOKUPS_ENABLED`
+In case you are using Postmark, you have to set the MAILER_EMAIL variable which needs to be configured in PostmarkApps sender signatures.
 
 </details>
 <details>
@@ -733,6 +688,8 @@ You'll receive an email once the data is imported.
 </details>
 <details>
 <summary>MaxMind</summary>
+
+To use MaxMind you need to create an account [here.](https://www.maxmind.com/en/geolite2/signup) Once you have your account details, you can add `MAXMIND_LICENSE_KEY` and `MAXMIND_EDITION` environmental valiables to your <kbd>plausible-conf.env</kbd> and the databases would be automatically downloaded and kept up to date. Note that using city-level databases like MaxMind's `GeoLite2-City` requires ~1GB more RAM.
 
 </details>
 
