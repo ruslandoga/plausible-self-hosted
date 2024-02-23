@@ -276,7 +276,7 @@ SECRET_KEY_BASE=GLVzDZW04FzuS1gMcmBRVhwgd4Gu9YmSl/k/TqfTUXti7FLBd7aflXeQDdwCj6Cz
 
 > ⚠️ Don't use this exact value or someone would be able to sign a cookie with `user_id=1` and log in as the admin!
 
-# `TOTP_VAULT_KEY`
+#### `TOTP_VAULT_KEY`
 
 Configures the secret used for encrypting TOTP secrets at rest, doesn't have any defaults and needs to be provided in the ENV vars, can be generated with `openssl rand -base64 32`
 
