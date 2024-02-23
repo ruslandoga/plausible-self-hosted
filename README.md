@@ -160,9 +160,44 @@ We recommend to pin the major version instead of using `latest`. Either way the 
 
 ```console
 $ cd hosting
-$ docker compose down --remove-orphans
-$ docker compose pull plausible
+$ docker compose stop plausible
+[+] Running 1/1
+ ✔ Container hosting-plausible-1  Stopped
+$ docker compose rm plausible
+? Going to remove hosting-plausible-1 Yes
+[+] Running 1/0
+ ✔ Container hosting-plausible-1  Removed
 $ docker compose -f docker-compose.yml -f reverse-proxy/docker-compose.caddy-gen.yml up -d
+[+] Running 8/8
+ ✔ plausible 7 layers [⣿⣿⣿⣿⣿⣿⣿]      0B/0B      Pulled 6.4s
+   ✔ 96526aa774ef Pull complete    0.4s
+   ✔ 93631fa7258d Pull complete    0.6s
+   ✔ 06afbc05374b Pull complete    1.6s
+   ✔ 7ddeeadcce1e Pull complete    1.2s
+   ✔ 724ddb9b523f Pull complete    2.8s
+   ✔ 32581b0068b9 Pull complete    1.7s
+   ✔ 4f4fb700ef54 Pull complete    2.0s
+[+] Running 4/4
+ ✔ Container hosting-plausible_events_db-1  Running    0.0s
+ ✔ Container hosting-plausible_db-1         Running    0.0s
+ ✔ Container hosting-plausible-1            Started    1.2s
+ ✔ Container caddy-gen                      Running    0.0s
+$ docker images --filter=reference='plausible/analytics:*'
+REPOSITORY            TAG       IMAGE ID       CREATED        SIZE
+plausible/analytics   v2.0      2b2735265a65   7 months ago   163MB
+plausible/analytics   v1.5      5e1e0047953a   8 months ago   130MB
+$ docker rmi 5e1e0047953a
+Untagged: plausible/analytics:v1.5
+Untagged: plausible/analytics@sha256:365124b00f103ac40ce3c64cd49a869d94f2ded221d9bb7900be1cecfaf34acf
+Deleted: sha256:5e1e0047953afc179ee884389e152b3f07343fb34e5586f9ecc2f33c6ba3bcaa
+Deleted: sha256:14613678c981c101ff6bac22e1ee2a1103d629de82fd33e2d7c40998493df44b
+Deleted: sha256:08517b5b600a93850ffff69ee757f4ce324d930a87e9acfeedea4d29b2bfa179
+Deleted: sha256:41285b4cfc8f9c07192b0b3308d43e4cd0490c19f935936c245820c62bec116e
+Deleted: sha256:d1611e769bae5b2e4000797f0b4209d1a3e37c298387ea9a158ec90cc0440d3a
+Deleted: sha256:6b5087bb47e9819e755b1376b351eb0b4f64d662a558fbf32014a645bafe56bf
+Deleted: sha256:650ac46dde2734de0e161be0b4043a77a83b84490560e7f633431b863c809dc3
+Deleted: sha256:5e02a5dddff634023169d45a1f99ae2765bd4b6e4666a6da16bd8ce22749f479
+Deleted: sha256:a1c01e366b99afb656cec4b16561b6ab299fa471011b4414826407af3a5884f8
 ```
 
 > You can omit <kbd>-f docker-compose.yml -f reverse-proxy/docker-compose.caddy-gen.yml</kbd> if you are not using Caddy.
