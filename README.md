@@ -184,7 +184,7 @@ BASE_URL=https://plausible.example.com
 SECRET_KEY_BASE=GLVzDZW04FzuS1gMcmBRVhwgd4Gu9YmSl/k/TqfTUXti7FLBd7aflXeQDdwCj6Cz
 ```
 
-And here's <kbd>plausible-conf.env</kbd> with extra configuration
+And here's <kbd>plausible-conf.env</kbd> with some extra configuration
 
 ```env
 BASE_URL=https://plausible.example.com
@@ -319,7 +319,7 @@ ECTO_CH_IPV6=true
 <details>
 <summary>Google</summary>
 
-For step-by-step integration with Google [see below.](#google-search-integration)
+For step-by-step integration with Google [see below.](#integrate)
 
 #### `GOOGLE_CLIENT_ID`
 
