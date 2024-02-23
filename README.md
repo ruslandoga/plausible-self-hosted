@@ -210,13 +210,11 @@ Changes in major versions would involve performing a data migration (e.g.[v2.0.0
 
 ## Configure
 
-Plausible is configured with environment variables, by default supplied via [<kbd>plausible-conf.env</kbd>](https://github.com/plausible/hosting/blob/master/plausible-conf.env) [env_file.](https://github.com/plausible/hosting/blob/bb6decee4d33ccf84eb235b6053443a01498db53/docker-compose.yml#L38-L39) They are read at startup in [`config/runtime.exs`](https://github.com/plausible/analytics/blob/master/config/runtime.exs)
-
-In the [container image](https://hub.docker.com/r/plausible/analytics) this script is located at `/app/releases/0.0.1/runtime.exs` and you can mount a custom one if, for example, you want to configure some option which doesn't have an environment varible in the default script.
+Plausible is configured with environment variables, by default supplied via [<kbd>plausible-conf.env</kbd>](https://github.com/plausible/hosting/blob/master/plausible-conf.env) [env_file.](https://github.com/plausible/hosting/blob/bb6decee4d33ccf84eb235b6053443a01498db53/docker-compose.yml#L38-L39)
 
 > Note that if you start a container with one set of ENV vars and then update the ENV vars and restart the container, they won't take effect due to the immutable nature of the containers. The container needs to be recreated.
 
-Here's the minimal <kbd>plausible-conf.env</kbd>
+Here's the minimal <kbd>plausible-conf.env</kbd> we got from [Quick start.](#quick-start)
 
 ```env
 BASE_URL=https://plausible.example.com
@@ -228,14 +226,12 @@ And here's <kbd>plausible-conf.env</kbd> with some extra configuration
 ```env
 BASE_URL=https://plausible.example.com
 SECRET_KEY_BASE=GLVzDZW04FzuS1gMcmBRVhwgd4Gu9YmSl/k/TqfTUXti7FLBd7aflXeQDdwCj6Cz
-PORT=8000
 MAXMIND_LICENSE_KEY=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
 MAXMIND_EDITION=GeoLite2-City
 GOOGLE_CLIENT_ID=140927866833-002gqg48rl4iku76lbkk0qhu0i0m7bia.apps.googleusercontent.com
 GOOGLE_CLIENT_SECRET=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
 MAILER_NAME=Plausible
 MAILER_EMAIL=plausible@plausible.example.com
-SENTRY_DSN=https://7f16e5d6dd72465789e081bd09481556@o1012425.ingest.sentry.io/6643873
 DISABLE_REGISTRATION=invite_only
 ```
 
@@ -290,7 +286,15 @@ Restricts registration of new users. Possible values are `true` (full restrictio
 
 Default: `false`
 
-When enabled, new users need to verify their email addressby following a link delivered to their mailbox.
+When enabled, new users need to verify their email addressby following a link delivered to their mailbox. Please configure your server for SMTP to receive this email. You can find Plausible's SMTP configuration options under "Email" below.
+
+If something went wrong you can run this command to verify all users in the database:
+
+<sub><kbd>console</kbd></sub>
+```console
+$ cd hosting
+$ docker compose exec plausible_db psql -U postgres -h localhost -d plausible_db -c "UPDATE users SET email_verified = true;"
+```
 
 </details>
 <details>
@@ -314,7 +318,7 @@ Configures the port to bind the listen socket for the web server.
 
 </details>
 <details>
-<summary>Database</summary>
+<summary>Database</summary><br/>
 
 Plausible uses PostgreSQL for storing user data and ClickhouseDB for analytics data. Use the following variables to configure them.
 
@@ -356,7 +360,7 @@ ECTO_CH_IPV6=true
 
 </details>
 <details>
-<summary>Google</summary>
+<summary>Google</summary><br/>
 
 For step-by-step integration with Google [see below.](#integrate)
 
@@ -382,19 +386,19 @@ GOOGLE_CLIENT_SECRET=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
 
 </details>
 <details>
-<summary>IP Geolocation</summary>
+<summary>IP Geolocation</summary><br/>
 
 Plausible CE uses the country database created by [db-ip](https://db-ip.com/) for enriching analytics data with visitor countries. The database is shipped within the container image and country data collection happens automatically.
 
 Optionally, you can provide a different database. For example, you can use [MaxMind](https://www.maxmind.com) services and enable city-level geolocation.
 
 
-| Parameter              | Default                                                                                                                             | Description                                                                                                                                                                                                                        |
-| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `IP_GEOLOCATION_DB`    | <kbd>/app/lib/plausible-0.0.1/priv/geodb/dbip-country.mmdb.gz</kbd>                                                                 | This database is used to lookup GeoName IDs for IP addresses. Defaults to the file shipped within the container image.                                                                                                             |
-| `GEONAMES_SOURCE_FILE` | <kbd>[/app/lib/location-0.1.0/priv/geonames.lite.csv](https://github.com/plausible/location/blob/main/priv/geonames.lite.csv)</kbd> | This file is used to turn GeoName IDs into human readable strings for display on the dashboard. Defaults to the one shipped within the container image.                                                                            |
-| `MAXMIND_LICENSE_KEY`  | --                                                                                                                                  | If set, this ENV variable takes precedence over `IP_GEOLOCATION_DB` and makes Plausible download (and keep up to date) a free MaxMind GeoLite2 MMDB of the selected edition. [See below](#integrate) for integration instructions. |
-| `MAXMIND_EDITION`      | <kbd>GeoLite2-City</kbd>                                                                                                            | MaxMind database edition to use (only if `MAXMIND_LICENSE_KEY` is set)                                                                                                                                                             |
+| Parameter              | Default                                                                                                                  | Description                                                                                                                                                                                                                        |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `IP_GEOLOCATION_DB`    | /app/lib/plausible-0.0.1/priv/geodb/dbip-country.mmdb.gz                                                                 | This database is used to lookup GeoName IDs for IP addresses. If not set, Plausible defaults to the [file](https://github.com/plausible/analytics/blob/v2.0.0/Dockerfile#L47) shipped within the container image.                  |
+| `GEONAMES_SOURCE_FILE` | [/app/lib/location-0.1.0/priv/geonames.lite.csv](https://github.com/plausible/location/blob/main/priv/geonames.lite.csv) | This file is used to turn GeoName IDs into human readable strings for display on the dashboard. Defaults to the one shipped within the container image.                                                                            |
+| `MAXMIND_LICENSE_KEY`  | --                                                                                                                       | If set, this ENV variable takes precedence over `IP_GEOLOCATION_DB` and makes Plausible download (and keep up to date) a free MaxMind GeoLite2 MMDB of the selected edition. [See below](#integrate) for integration instructions. |
+| `MAXMIND_EDITION`      | <kbd>GeoLite2-City</kbd>                                                                                                 | MaxMind database edition to use (only if `MAXMIND_LICENSE_KEY` is set)                                                                                                                                                             |
 
 <sub>Example <kbd>plausible-conf.env</kbd> with MaxMind configured</sub>
 ```env
@@ -405,7 +409,7 @@ MAXMIND_EDITION=GeoLite2-City
 ```
 
 </details>
-<details><summary>Email</summary>
+<details><summary>Email</summary><br/>
 
 Plausible CE uses a SMTP server to send transactional emails e.g. account activation, password reset. In addition, it sends non-transactional emails like weekly or monthly reports.
 
