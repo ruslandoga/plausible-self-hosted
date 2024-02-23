@@ -167,7 +167,7 @@ $ docker compose -f docker-compose.yml -f reverse-proxy/docker-compose.caddy-gen
 
 > You can omit <kbd>-f docker-compose.yml -f reverse-proxy/docker-compose.caddy-gen.yml</kbd> if you are not using Caddy.
 
-Changes in major versions would involve performing a data migration (e.g.[v2.0.0.](https://github.com/plausible/analytics/releases/tag/v2.0.0)) or some other extra step.
+Changes in major versions would involve performing a data migration (e.g.[v2.0.0](https://github.com/plausible/analytics/releases/tag/v2.0.0)) or some other extra step.
 
 ## Configure
 
@@ -738,7 +738,154 @@ You'll receive an email once the data is imported.
 
 ## FAQ
 
-- useful clickhouse commands
-- useful docker commands
-- useful postgres commands
-- useful plausible commands
+<details>
+<summary>How do I access Plausible console?</summary>
+
+<sub><kbd>console</kbd></sub>
+```console
+$ cd hosting
+$ docker compose exec plausible bin/plausible remote
+```
+```elixir
+iex> Application.get_all_env :plausible
+[
+  {PlausibleWeb.Endpoint,
+   [
+     live_view: [signing_salt: "f+bZg/crMtgjZJJY7X6OwIWc3XJR2C5Y"],
+     pubsub_server: Plausible.PubSub,
+     render_errors: [
+       view: PlausibleWeb.ErrorView,
+       layout: {PlausibleWeb.LayoutView, "base_error.html"},
+       accepts: ["html", "json"]
+     ]
+# etc.
+# use ^C^C (ctrl+ctrl) to exit
+```
+
+</details>
+
+<details>
+<summary>How do I access ClickHouse console?</summary>
+
+<sub><kbd>console</kbd></sub>
+```console
+$ cd hosting
+$ docker compose exec plausible_events_db clickhouse client --database plausible_events_db
+```
+```sql
+:) show tables
+
+-- ┌─name───────────────────────┐
+-- │ events                     │
+-- │ events_v2                  │
+-- │ imported_browsers          │
+-- │ imported_devices           │
+-- │ imported_entry_pages       │
+-- │ imported_exit_pages        │
+-- │ imported_locations         │
+-- │ imported_operating_systems │
+-- │ imported_pages             │
+-- │ imported_sources           │
+-- │ imported_visitors          │
+-- │ ingest_counters            │
+-- │ schema_migrations          │
+-- │ sessions                   │
+-- │ sessions_v2                │
+-- └────────────────────────────┘
+
+:) exit
+
+-- Bye
+```
+
+</details>
+
+<details>
+<summary>How do I access PostgreSQL console?</summary>
+
+<sub><kbd>console</kbd></sub>
+```console
+$ cd hosting
+$ docker compose exec plausible_db psql -U postgres -h localhost -d plausible_db
+```
+```sql
+plausible_db=# \d
+
+--                                List of relations
+--  Schema |                      Name                      |   Type   |  Owner
+-- --------+------------------------------------------------+----------+----------
+--  public | api_keys                                       | table    | postgres
+--  public | api_keys_id_seq                                | sequence | postgres
+--  public | check_stats_emails                             | table    | postgres
+--  public | check_stats_emails_id_seq                      | sequence | postgres
+--  public | create_site_emails                             | table    | postgres
+--  public | create_site_emails_id_seq                      | sequence | postgres
+--  public | email_activation_codes                         | table    | postgres
+--  public | email_activation_codes_id_seq                  | sequence | postgres
+--  public | email_verification_codes                       | table    | postgres
+--  public | enterprise_plans                               | table    | postgres
+--  public | enterprise_plans_id_seq                        | sequence | postgres
+--  public | feedback_emails                                | table    | postgres
+--  public | feedback_emails_id_seq                         | sequence | postgres
+--  public | fun_with_flags_toggles                         | table    | postgres
+--  public | fun_with_flags_toggles_id_seq                  | sequence | postgres
+--  public | funnel_steps                                   | table    | postgres
+--  public | funnel_steps_id_seq                            | sequence | postgres
+--  public | funnels                                        | table    | postgres
+--  public | funnels_id_seq                                 | sequence | postgres
+--  public | goals                                          | table    | postgres
+--  public | goals_id_seq                                   | sequence | postgres
+--  public | google_auth                                    | table    | postgres
+--  public | google_auth_id_seq                             | sequence | postgres
+--  public | intro_emails                                   | table    | postgres
+--  public | intro_emails_id_seq                            | sequence | postgres
+--  public | invitations                                    | table    | postgres
+--  public | invitations_id_seq                             | sequence | postgres
+--  public | monthly_reports                                | table    | postgres
+--  public | monthly_reports_id_seq                         | sequence | postgres
+--  public | oban_jobs                                      | table    | postgres
+--  public | oban_jobs_id_seq                               | sequence | postgres
+--  public | oban_peers                                     | table    | postgres
+--  public | plugins_api_tokens                             | table    | postgres
+--  public | salts                                          | table    | postgres
+--  public | salts_id_seq                                   | sequence | postgres
+--  public | schema_migrations                              | table    | postgres
+--  public | sent_accept_traffic_until_notifications        | table    | postgres
+--  public | sent_accept_traffic_until_notifications_id_seq | sequence | postgres
+--  public | sent_monthly_reports                           | table    | postgres
+--  public | sent_monthly_reports_id_seq                    | sequence | postgres
+--  public | sent_renewal_notifications                     | table    | postgres
+--  public | sent_renewal_notifications_id_seq              | sequence | postgres
+--  public | sent_weekly_reports                            | table    | postgres
+--  public | sent_weekly_reports_id_seq                     | sequence | postgres
+--  public | setup_help_emails                              | table    | postgres
+--  public | setup_help_emails_id_seq                       | sequence | postgres
+--  public | setup_success_emails                           | table    | postgres
+--  public | setup_success_emails_id_seq                    | sequence | postgres
+--  public | shared_links                                   | table    | postgres
+--  public | shared_links_id_seq                            | sequence | postgres
+--  public | shield_rules_ip                                | table    | postgres
+--  public | site_imports                                   | table    | postgres
+--  public | site_imports_id_seq                            | sequence | postgres
+--  public | site_memberships                               | table    | postgres
+--  public | site_memberships_id_seq                        | sequence | postgres
+--  public | site_user_preferences                          | table    | postgres
+--  public | site_user_preferences_id_seq                   | sequence | postgres
+--  public | sites                                          | table    | postgres
+--  public | sites_id_seq                                   | sequence | postgres
+--  public | spike_notifications                            | table    | postgres
+--  public | spike_notifications_id_seq                     | sequence | postgres
+--  public | subscriptions                                  | table    | postgres
+--  public | subscriptions_id_seq                           | sequence | postgres
+--  public | totp_recovery_codes                            | table    | postgres
+--  public | totp_recovery_codes_id_seq                     | sequence | postgres
+--  public | users                                          | table    | postgres
+--  public | users_id_seq                                   | sequence | postgres
+--  public | weekly_reports                                 | table    | postgres
+--  public | weekly_reports_id_seq                          | sequence | postgres
+-- (69 rows)
+
+plausible_db=# exit
+```
+
+</details>
