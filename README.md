@@ -143,14 +143,7 @@ $ docker compose -f docker-compose.yml -f reverse-proxy/docker-compose.caddy-gen
 
 It takes some time to start PostgreSQL and ClickHouse, create the databases, and run the migrations. After about fifteen seconds you should be able to access your instance at `BASE_URL` and see the registration screen for the admin user.
 
-In case something feels off, make sure to check out the logs
-
-<sub><kbd>console</kbd></sub>
-```console
-$ docker compose logs
-```
-
-and start a [GitHub discussion.](https://github.com/plausible/analytics/discussions/categories/self-hosted-support)
+In case something feels off, make sure to check out the logs with <kbd>docker compose logs</kbd> and start a [GitHub discussion.](https://github.com/plausible/analytics/discussions/categories/self-hosted-support)
 
 Happy hosting!
 
